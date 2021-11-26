@@ -20,6 +20,7 @@ func createQueues() {
 
 	createQueueWithDLQFailingOnError(rabbitCh, &amqp_abstraction.QueueProperties{QueueName: "queue_name"})
 	createQueueWithDLQFailingOnError(rabbitCh, &amqp_abstraction.QueueProperties{QueueName: "second_queue_name"})
+	createQueueWithDLQFailingOnError(rabbitCh, &amqp_abstraction.QueueProperties{QueueName: "failing_queue_name"})
 
 	log.Println("Finished Queues Creation")
 

@@ -13,7 +13,7 @@ type ExampleObj struct {
 }
 
 type ExampleObj2 struct {
-    Body            ExampleObj         `json:"body"`
+    Body ExampleObj `json:"body"`
 }
 
 func handle(messageBody []byte) (createdEvents []amqpabstraction.QueueEvent, err error) {

@@ -25,8 +25,6 @@ func ExitApplicationOnError(err error, msg string) {
 	}
 }
 
-
-
 func handle(messageBody []byte) (createdEvents []amqpAbs.QueueEvent, err error) {
 	exampleObj := ExampleObj{}
 	if err = json.Unmarshal(messageBody, &exampleObj); err != nil {

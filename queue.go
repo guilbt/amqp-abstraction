@@ -7,6 +7,8 @@ import (
 	"time"
 )
 
+const RetriesHeader = "x-retries"
+
 type QueueProperties struct {
 	ExchangeName string
 	QueueName    string
@@ -24,25 +26,25 @@ func CreateSimpleQueue(ch *amqp.Channel, queueName string, args amqp.Table) erro
 	return err
 }
 
-func CreateDLQ(ch *amqp.Channel, queueName string) (dlxName string, err error) {
+func CreateDLQ(ch *amqp.Channel, queueName string) (dlxName string, dlqName string, err error) {
 	dlxName = fmt.Sprintf("%s-dlx", queueName)
-	dlqName := fmt.Sprintf("%s-dlq", queueName)
+	dlqName = fmt.Sprintf("%s-dlq", queueName)
 	if err := ch.ExchangeDeclare(
 		dlxName, "fanout", true, false, false, false, nil,
 	); err != nil {
-		return dlxName, err
+		return dlxName, dlqName, err
 	}
 	if err := CreateSimpleQueue(ch, dlqName, nil); err != nil {
-		return dlxName, err
+		return dlxName, dlqName, err
 	}
 	err = ch.QueueBind(
 		dlqName, "", dlxName, false, nil,
 	)
-	return dlxName, err
+	return dlxName, dlqName, err
 }
 
 func CreateQueueWithDLQ(ch *amqp.Channel, properties *QueueProperties) error {
-	if dlxName, err := CreateDLQ(ch, properties.QueueName); err != nil {
+	if dlxName, dlqName, err := CreateDLQ(ch, properties.QueueName); err != nil {
 		return err
 	} else {
 		err = CreateSimpleQueue(
@@ -50,6 +52,7 @@ func CreateQueueWithDLQ(ch *amqp.Channel, properties *QueueProperties) error {
 			properties.QueueName,
 			amqp.Table{
 				"x-dead-letter-exchange": dlxName,
+				"x-dead-letter-routing-key": dlqName,
 			},
 		)
 		return err

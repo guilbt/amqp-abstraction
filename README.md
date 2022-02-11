@@ -48,7 +48,7 @@ func main() {
 	ExitApplicationOnError(err, fmt.Sprintf("Error starting consumer %s", consumerName))
 
 	for message := range messages {
-		go consumer.ConsumeMessage(&message, handle)
+		consumer.ConsumeMessage(&message, handle)
 	}
 }
  
